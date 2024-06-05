@@ -1,0 +1,70 @@
+class CodeGenerator:
+  """
+  A simple code generator class for illustrative purposes.
+  """
+  def __init__(self, target_arch="x86"):
+    self.target_arch = target_arch  # Target architecture (e.g., x86)
+    self.code = []  # List to store generated assembly instructions
+
+  def generate_assignment(self, variable, expression):
+    """
+    Generates assembly instruction for assignment based on the expression type.
+
+    Args:
+      variable: Name of the variable to assign to.
+      expression: The expression to be evaluated (assumed to be a simple arithmetic expression).
+    """
+    if self.target_arch == "x86":
+      # Example x86 instructions for assignment (modify based on target)
+      if isinstance(expression, int):  # Constant value
+        self.code.append(f"mov eax, {expression}")  # Load constant into register eax
+      elif isinstance(expression, str):  # Variable name
+        self.code.append(f"mov eax, [{expression}]")  # Load variable value into eax
+      self.code.append(f"mov [{variable}], eax")  # Store value in memory location
+    else:
+      raise NotImplementedError(f"Target architecture {self.target_arch} not supported yet")
+
+  def translate_expression(self, expression):
+    """
+    Translates a simple arithmetic expression to assembly instructions.
+
+    Args:
+      expression: The expression to be translated (assumed to be a string or an integer).
+    """
+    if isinstance(expression, str):
+      # Assume expression is a variable name
+      self.generate_assignment("eax", expression)  # Load variable value into eax
+    elif isinstance(expression, int):
+      # Constant value, already handled in generate_assignment
+      pass
+    else:
+      raise NotImplementedError(f"Unsupported expression type: {type(expression)}")
+
+  def generate_code(self, expression, variable):
+    """
+    Generates the complete code for evaluating an expression and assigning it to a variable.
+
+    Args:
+      expression: The expression to be evaluated (assumed to be a string or an integer).
+      variable: The variable to assign the result to.
+    """
+    self.translate_expression(expression)
+    self.generate_assignment(variable, "eax")  # Assign value in eax to the variable
+
+  def get_code(self):
+    """
+    Returns the generated assembly code as a list of strings.
+    """
+    return self.code
+
+# Example usage
+generator = CodeGenerator()
+expression = "x"  # Variable or a constant value
+variable = "y"
+
+generator.generate_code(expression, variable)
+
+code = generator.get_code()
+print("Generated code:")
+for line in code:
+  print(line)

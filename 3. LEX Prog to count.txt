@@ -1,0 +1,83 @@
+Program to count the numbers of lines, words, spaces, and characters from a given file
+
+
+%option noyywrap
+%{
+#include <stdio.h>
+
+int char_count = 0;
+int word_count = 0;
+int line_count = 0;
+FILE *output_file;
+
+void increment_line_count() {
+    line_count++;
+    fprintf(output_file, "%4d  ", line_count);
+}
+
+%}
+
+%%
+
+\n          { increment_line_count(); char_count++; }
+[ \t\r]+    { /* Ignore white spaces, tabs, and carriage returns */ }
+[a-zA-Z]+   { word_count++; char_count += yyleng; fprintf(output_file, "%s", yytext); }
+.           { char_count++; fprintf(output_file, "%s", yytext); }
+
+%%
+
+int main(int argc, char *argv[]) {
+    if (argc < 3) {
+        fprintf(stderr, "Usage: %s <input_file> <output_file>\n", argv[0]);
+        return 1;
+    }
+
+    FILE *input_file = fopen(argv[1], "r");
+    if (!input_file) {
+        perror("Error opening input file");
+        return 1;
+    }
+
+    output_file = fopen(argv[2], "w");
+    if (!output_file) {
+        perror("Error opening output file");
+        fclose(input_file);
+        return 1;
+    }
+
+    // Redirect yyin to read from input_file
+    yyin = input_file;
+
+    // Start counting lines from 1
+    increment_line_count();
+
+    yylex();
+
+    fprintf(output_file, "\n\nCharacter Count: %d\n", char_count);
+    fprintf(output_file, "Word Count: %d\n", word_count);
+    fprintf(output_file, "Line Count: %d\n", line_count);
+
+    fclose(input_file);
+    fclose(output_file);
+
+    printf("Character Count: %d\n", char_count);
+    printf("Word Count: %d\n", word_count);
+    printf("Line Count: %d\n", line_count);
+
+    return 0;
+}
+
+
+
+///////////////////////
+
+Output:
+SDL:~/LexYacc$ lex demo.l
+
+SDL:~/LexYacc$ gcc lex.yy.c
+
+SDL:~/LexYacc$ ./a.exe input.txt output.txt
+
+(Note: input.txt is the input file containing input text)
+
+//////////////////////

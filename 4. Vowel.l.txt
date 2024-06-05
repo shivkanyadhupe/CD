@@ -1,0 +1,54 @@
+Lex program that identifies words starting with a vowel and increments the counter. 
+
+
+%option noyywrap
+%{
+#include <stdio.h>
+
+int vowel_count = 0;
+int word_count = 0;
+%}
+
+%%
+
+[aeiouAEIOU][a-zA-Z]+  { vowel_count++; printf("%s%d\n", yytext, vowel_count); }
+[a-zA-Z]+              { word_count++; printf("%s\n", yytext); }
+\n                      { /* Do nothing for newlines */ }
+.                       { /* Ignore other characters */ }
+
+%%
+
+int main() {
+  yyin = fopen("input.txt", "r");
+  if (yyin  == NULL) {
+    perror("Error opening file");
+    return 1;
+  }
+
+  yylex();
+
+  fclose(yyin);
+  printf("\nTotal vowels: %d\n", vowel_count);
+  printf("Total words: %d  \n", word_count + vowel_count);
+  return 0;
+}
+
+
+................................................
+
+3.  Compilation and Execution: 
+   - Compile the Lex program: `lex vowel_counter.l`
+   - Compile the generated `lex.yy.c` file along with the `main.c` file: `gcc lex.yy.c main.c -o vowel_counter`
+   - Run the program: `./vowel_counter`
+
+4.  Input File (`input.txt`): 
+   Create an `input.txt` file containing English words (one word per line).
+
+5.  Output: 
+   - The program will display the modified words (with appended counter) and the total number of words starting with a vowel.
+
+
+How to run:
+1. flex file_name.l
+2. gcc lex.yy.c
+3. ./a.exe
